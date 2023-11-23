@@ -6,21 +6,39 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 
 public class ItemsDataBaseHandler extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "items.db";
-    private static final int VERSION = 1;
-    public ItemsDataBaseHandler(Context context) {
+    private static final int VERSION = 2;
+    private static ItemsDataBaseHandler single_instance = null;
+    private final String ActiveUser;
+    private ItemsDataBaseHandler(Context context) {
         super(context, DATABASE_NAME, null, VERSION);
+        UserDataBaseHandler userDB = UserDataBaseHandler.getInstance(context);
+        ActiveUser = userDB.getActiveUser();
     }
     private static final class ItemTable {
         private static final String TABLE = "items";
         private static final String COL_ID = "_id";
         private static final String COL_ITEMNAME = "itemname";
         private static final String COL_COUNT = "count";
+        private static final String COL_DESC = "description";
+        private static final String COL_LASTUSER = "lastuser";
+        private static final String COL_LASTDATE = "lastdate";
+    }
+    //https://www.geeksforgeeks.org/singleton-class-java/#
+    public static synchronized ItemsDataBaseHandler getInstance(Context context)
+    {
+        if (single_instance == null)
+            single_instance = new ItemsDataBaseHandler(context);
+
+        return single_instance;
     }
 
     public static class Item {
@@ -51,6 +69,34 @@ public class ItemsDataBaseHandler extends SQLiteOpenHelper {
         private String name;
         private long _id;
         private int count;
+
+        public String getDesc() {
+            return desc;
+        }
+
+        public void setDesc(String desc) {
+            this.desc = desc;
+        }
+
+        public String getLastUser() {
+            return lastUser;
+        }
+
+        public void setLastUser(String lastUser) {
+            this.lastUser = lastUser;
+        }
+
+        public String getLastDate() {
+            return lastDate;
+        }
+
+        public void setLastDate(String lastDate) {
+            this.lastDate = lastDate;
+        }
+
+        private String desc;
+        private String lastUser;
+        private String lastDate;
     }
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -58,17 +104,20 @@ public class ItemsDataBaseHandler extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE " + ItemTable.TABLE + " (" +
                 ItemTable.COL_ID + " integer PRIMARY KEY AUTOINCREMENT, " +
                 ItemTable.COL_ITEMNAME + " TEXT, " +
-                ItemTable.COL_COUNT + " INTEGER)");
+                ItemTable.COL_COUNT + " INTEGER," +
+                ItemTable.COL_DESC + " TEXT DEFAULT 'No Description'," +
+                ItemTable.COL_LASTUSER + " TEXT DEFAULT 'No User'," +
+                ItemTable.COL_LASTDATE + " TEXT DEFAULT 'No Date')");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Not fully made, should not ever happen anyway.
-        db.execSQL("drop table if exists " + ItemTable.TABLE);
-        onCreate(db);
+        db.execSQL("ALTER TABLE " + ItemTable.TABLE + " ADD COLUMN " + ItemTable.COL_DESC + " TEXT DEFAULT 'No Description'");
+        db.execSQL("ALTER TABLE " + ItemTable.TABLE + " ADD COLUMN " + ItemTable.COL_LASTUSER + " TEXT DEFAULT 'No User'");
+        db.execSQL("ALTER TABLE " + ItemTable.TABLE + " ADD COLUMN " + ItemTable.COL_LASTDATE + " TEXT DEFAULT 'No Date'");
     }
 
-    public long addItem(String item) {
+    public long addItem(String item, String lastUser) {
         // -1 is item not found.
         if (item.isEmpty())
             return -1;
@@ -78,6 +127,9 @@ public class ItemsDataBaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(ItemTable.COL_ITEMNAME, item);
         values.put(ItemTable.COL_COUNT, 0);
+        values.put(ItemTable.COL_DESC, "No description");
+        values.put(ItemTable.COL_LASTUSER, lastUser);
+        values.put(ItemTable.COL_LASTDATE, CurrentDate());
 
         return db.insert(ItemTable.TABLE, null, values);
     }
@@ -94,6 +146,9 @@ public class ItemsDataBaseHandler extends SQLiteOpenHelper {
                 item.set_id(cursor.getLong(0));
                 item.setName(cursor.getString(1));
                 item.setCount(cursor.getInt(2));
+                item.setDesc(cursor.getString(3));
+                item.setLastUser(cursor.getString(4));
+                item.setLastDate(cursor.getString(5));
                 items.add(item);
             } while (cursor.moveToNext());
         }
@@ -112,6 +167,9 @@ public class ItemsDataBaseHandler extends SQLiteOpenHelper {
             item.set_id(cursor.getLong(0));
             item.setName(cursor.getString(1));
             item.setCount(cursor.getInt(2));
+            item.setDesc(cursor.getString(3));
+            item.setLastUser(cursor.getString(4));
+            item.setLastDate(cursor.getString(5));
         }
         else
             item = null; // Item not found.
@@ -131,8 +189,27 @@ public class ItemsDataBaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(ItemTable.COL_COUNT, count);
+        values.put(ItemTable.COL_LASTUSER, ActiveUser);
+        values.put(ItemTable.COL_LASTDATE, CurrentDate());
         int changed = db.update(ItemTable.TABLE, values, "_id = ?",
                 new String[] { Long.toString(id) });
         return changed >= 1;
+    }
+    public boolean UpdateDescByID(long id, String desc) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(ItemTable.COL_DESC, desc);
+        values.put(ItemTable.COL_LASTUSER, ActiveUser);
+        values.put(ItemTable.COL_LASTDATE, CurrentDate());
+        int changed = db.update(ItemTable.TABLE, values, "_id = ?",
+                new String[] { Long.toString(id) });
+        return changed >= 1;
+    }
+    private String CurrentDate() {
+        // https://www.javatpoint.com/java-get-current-date
+        // https://www.geeksforgeeks.org/dateformat-getdatetimeinstance-method-in-java-with-examples/
+        DateFormat DFormat = DateFormat.getDateTimeInstance();
+        Date date = new Date();
+        return DFormat.format(date);
     }
 }

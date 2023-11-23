@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class DetailFragment extends Fragment implements DeleteDialog.DeleteDialogListener, ChangeDialog.ChangeDialogListener{
+public class DetailFragment extends Fragment implements DeleteDialog.DeleteDialogListener, ChangeDialog.ChangeDialogListener, DescDialog.DescDialogListener {
 
     public static final String ARG_ITEM_ID = "item_id";
     private ItemsDataBaseHandler.Item dbItem;
@@ -40,7 +40,7 @@ public class DetailFragment extends Fragment implements DeleteDialog.DeleteDialo
             itemID = args.getLong(ARG_ITEM_ID);
         }
 
-        itemsDB = new ItemsDataBaseHandler(getContext());
+        itemsDB = ItemsDataBaseHandler.getInstance(getContext());
         // Getting the item info.
         dbItem = itemsDB.getByID(itemID);
 
@@ -80,6 +80,10 @@ public class DetailFragment extends Fragment implements DeleteDialog.DeleteDialo
             ChangeDialog dialog = new ChangeDialog();
             dialog.show(getParentFragmentManager(), "changeDialog");
             return true;
+        } else if (item.getItemId() == R.id.action_change_desc) {
+            DescDialog dialog = new DescDialog();
+            dialog.show(getParentFragmentManager(), "descDialog");
+            return true;
         }
 
 
@@ -101,9 +105,14 @@ public class DetailFragment extends Fragment implements DeleteDialog.DeleteDialo
         dbItem = itemsDB.getByID(itemID);
         updateThisScreen();
     }
+    private void changeDesc(String desc) {
+        itemsDB.UpdateDescByID(itemID, desc);
+        dbItem = itemsDB.getByID(itemID);
+        updateThisScreen();
+    }
     public void updateThisScreen() {
         nameTextView.setText(dbItem.getName());
-        descriptionTextView.setText(getString(R.string.detail_item_amount, dbItem.getCount(), dbItem.get_id()));
+        descriptionTextView.setText(getString(R.string.detail_item_amount, dbItem.getCount(), dbItem.get_id(), dbItem.getDesc(), dbItem.getLastUser(), dbItem.getLastDate()));
     }
 
     @Override
@@ -122,6 +131,17 @@ public class DetailFragment extends Fragment implements DeleteDialog.DeleteDialo
             // add dialog it checks if it's possible to be an int already.
             int userInputInt = Integer.parseInt(userInput);
             changeAmount(userInputInt);
+            permSMSFileHandler.checkIfAlert(requireActivity(), dbItem);
+
+        }
+        else if (dialog instanceof DescDialog)
+        {
+            String userInput = ((DescDialog)dialog).input.getText().toString();
+            if (userInput.isEmpty()) {
+                Toast.makeText(getContext(), R.string.gen_invalid, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            changeDesc(userInput);
             permSMSFileHandler.checkIfAlert(requireActivity(), dbItem);
 
         }

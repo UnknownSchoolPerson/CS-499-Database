@@ -17,9 +17,11 @@ import androidx.fragment.app.FragmentManager;
 
 import java.util.List;
 
+/** @noinspection ALL*/
 public class LowInvDialog extends DialogFragment {
     interface LowInvDialogListener {
         void onDialogPositiveClick(DialogFragment dialog);
+        /** @noinspection EmptyMethod*/
         void onDialogNeutralClick(DialogFragment dialog);
 
     }

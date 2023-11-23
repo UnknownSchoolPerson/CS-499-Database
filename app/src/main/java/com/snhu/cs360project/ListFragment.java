@@ -26,7 +26,7 @@ public class ListFragment extends Fragment implements  AddDialog.AddDialogListen
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        itemsDB = new ItemsDataBaseHandler(getContext());
+        itemsDB = ItemsDataBaseHandler.getInstance(getContext());
         View rootView = inflater.inflate(R.layout.fragment_list, container, false);
         this.rootView = rootView;
         fillRecycler(rootView);
@@ -137,7 +137,8 @@ public class ListFragment extends Fragment implements  AddDialog.AddDialogListen
                 Toast.makeText(getContext(), R.string.gen_invalid, Toast.LENGTH_SHORT).show();
                 return;
             }
-            itemsDB.addItem(userInput);
+            UserDataBaseHandler userDB = UserDataBaseHandler.getInstance(getContext());
+            itemsDB.addItem(userInput, userDB.getActiveUser());
             fillRecycler(rootView);
         } else if (dialog instanceof LowInvDialog)
         {

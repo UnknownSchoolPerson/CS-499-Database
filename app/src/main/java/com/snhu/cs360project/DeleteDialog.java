@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentManager;
 
 import java.util.List;
 
+/** @noinspection ALL*/
 public class DeleteDialog extends DialogFragment {
     interface DeleteDialogListener {
         void onDialogPositiveClick(DialogFragment dialog);

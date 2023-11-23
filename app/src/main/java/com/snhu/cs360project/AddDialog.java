@@ -14,7 +14,9 @@ import androidx.fragment.app.FragmentManager;
 
 import java.util.List;
 
+/** @noinspection ALL*/
 public class AddDialog extends DialogFragment {
+    /** @noinspection EmptyMethod*/
     interface AddDialogListener {
         void onDialogPositiveClick(DialogFragment dialog);
         void onDialogNeutralClick(DialogFragment dialog);

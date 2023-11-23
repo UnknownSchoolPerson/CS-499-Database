@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //Log.d(TAG, "onCreate: Main");
-        usersDatabase = new UserDataBaseHandler(getApplicationContext());
+        usersDatabase = UserDataBaseHandler.getInstance(getApplicationContext());
         usernameText = findViewById(R.id.usernameInput);
         passwordText = findViewById(R.id.passwordInput);
     }

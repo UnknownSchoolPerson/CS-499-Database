@@ -19,9 +19,10 @@
     <string name="notifications_access">Notifications Access</string>
     <string name="notifications_good">Notifications are enabled!</string>
     <string name="notifications_bad">Please enable SMS and Notifications permissions to receive notifications!!</string>
-    <string name="detail_item_amount">Amount: %1$d\nID: %2$d</string>
+    <string name="detail_item_amount">Amount: %1$d\nID: %2$d\nDesc: %3$s\nLast User: %4$s\nLast Date: %5$s</string>
     <string name="list_item">%1$s\nAmount: %2$d</string>
     <string name="change">Change</string>
     <string name="new_amount">Enter in the new amount</string>
     <string name="change_low_inv_alert">Change Low Inv Alert\nLeave blank to not change\nWill always check everything</string>
+    <string name="change_description">Change Description</string>
 </resources>

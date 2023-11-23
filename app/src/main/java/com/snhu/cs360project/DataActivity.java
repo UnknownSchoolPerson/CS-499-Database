@@ -18,7 +18,7 @@ public class DataActivity extends AppCompatActivity {
         // Also setting up the DB.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data);
-        itemsDB = new ItemsDataBaseHandler(getApplicationContext());
+        itemsDB = ItemsDataBaseHandler.getInstance(getApplicationContext());
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment);
 

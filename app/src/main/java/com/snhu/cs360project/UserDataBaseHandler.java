@@ -16,7 +16,7 @@ import javax.crypto.spec.PBEKeySpec;
 public class UserDataBaseHandler extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "users.db";
     private static final int VERSION = 1;
-    public UserDataBaseHandler(Context context) {
+    private UserDataBaseHandler(Context context) {
         super(context, DATABASE_NAME, null, VERSION);
     }
     private static final class UserTable {
@@ -25,6 +25,22 @@ public class UserDataBaseHandler extends SQLiteOpenHelper {
         private static final String COL_USERNAME = "username";
         private static final String COL_PASSWORD = "password";
         private static final String COL_SALT = "salt";
+    }
+
+    public String getActiveUser() {
+        return activeUser;
+    }
+
+    private String activeUser = null;
+    private static UserDataBaseHandler single_instance = null;
+    // Good idea from https://stackoverflow.com/a/1944842 to get a 'global'
+    // https://www.geeksforgeeks.org/singleton-class-java/#
+    public static synchronized UserDataBaseHandler getInstance(Context context)
+    {
+        if (single_instance == null)
+            single_instance = new UserDataBaseHandler(context);
+
+        return single_instance;
     }
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -71,7 +87,7 @@ public class UserDataBaseHandler extends SQLiteOpenHelper {
         hashedPassword = hashPassword(salt, password);
         values.put(UserTable.COL_PASSWORD, hashedPassword);
         values.put(UserTable.COL_SALT, salt);
-
+        activeUser = user;
         return db.insert(UserTable.TABLE, null, values);
     }
 
@@ -103,8 +119,10 @@ public class UserDataBaseHandler extends SQLiteOpenHelper {
             byte[] passwordDB = cursor.getBlob(0);
             byte[] saltDB = cursor.getBlob(1);
             byte[] userInputHashed = hashPassword(saltDB, password);
-            if (Arrays.equals(userInputHashed, passwordDB))
+            if (Arrays.equals(userInputHashed, passwordDB)) {
                 valid = true;
+                activeUser = user;
+            }
         }
         cursor.close();
         return valid;
