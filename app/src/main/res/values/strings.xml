@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">CS360 Project</string>
+    <string name="user_label">Username</string>
+    <string name="pass_label">Password</string>
+    <string name="login_text">Login</string>
+    <string name="reg_text">Register</string>
+    <string name="bad_reg">Invalid info or user is already created!</string>
+    <string name="invalid_login">Username or password is wrong!</string>
+    <string name="del_yes">Yes</string>
+    <string name="del_no">No</string>
+    <string name="del_ask">Would you like to delete this item?</string>
+    <string name="del_del">Delete</string>
+    <string name="add_add">Add</string>
+    <string name="add_cancel">Cancel</string>
+    <string name="add_ask">Enter in the name of the item</string>
+    <string name="gen_invalid">Invalid Input!</string>
+    <string name="change_amount">Change amount</string>
+    <string name="delete_this_item">Delete this item</string>
+    <string name="notifications_access">Notifications Access</string>
+    <string name="notifications_good">Notifications are enabled!</string>
+    <string name="notifications_bad">Please enable SMS and Notifications permissions to receive notifications!!</string>
+    <string name="detail_item_amount">Amount: %1$d\nID: %2$d</string>
+    <string name="list_item">%1$s\nAmount: %2$d</string>
+    <string name="change">Change</string>
+    <string name="new_amount">Enter in the new amount</string>
+    <string name="change_low_inv_alert">Change Low Inv Alert\nLeave blank to not change\nWill always check everything</string>
+</resources>

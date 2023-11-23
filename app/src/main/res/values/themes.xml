@@ -1,0 +1,7 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Base.Theme.CS360Project" parent="Theme.AppCompat.DayNight.DarkActionBar">
+
+    </style>
+
+    <style name="Theme.CS360Project" parent="Base.Theme.CS360Project" />
+</resources>
