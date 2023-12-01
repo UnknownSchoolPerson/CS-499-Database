@@ -35,6 +35,7 @@ public class ItemsDataBaseHandler extends SQLiteOpenHelper {
     //https://www.geeksforgeeks.org/singleton-class-java/#
     public static synchronized ItemsDataBaseHandler getInstance(Context context)
     {
+        // Singleton setup
         if (single_instance == null)
             single_instance = new ItemsDataBaseHandler(context);
 
@@ -112,6 +113,8 @@ public class ItemsDataBaseHandler extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // Only version right now is 1
+        // So we will only need to add to that
         db.execSQL("ALTER TABLE " + ItemTable.TABLE + " ADD COLUMN " + ItemTable.COL_DESC + " TEXT DEFAULT 'No Description'");
         db.execSQL("ALTER TABLE " + ItemTable.TABLE + " ADD COLUMN " + ItemTable.COL_LASTUSER + " TEXT DEFAULT 'No User'");
         db.execSQL("ALTER TABLE " + ItemTable.TABLE + " ADD COLUMN " + ItemTable.COL_LASTDATE + " TEXT DEFAULT 'No Date'");
@@ -123,14 +126,14 @@ public class ItemsDataBaseHandler extends SQLiteOpenHelper {
             return -1;
 
         SQLiteDatabase db = getWritableDatabase();
-
+        // Setup out values to add
         ContentValues values = new ContentValues();
         values.put(ItemTable.COL_ITEMNAME, item);
         values.put(ItemTable.COL_COUNT, 0);
         values.put(ItemTable.COL_DESC, "No description");
         values.put(ItemTable.COL_LASTUSER, lastUser);
         values.put(ItemTable.COL_LASTDATE, CurrentDate());
-
+        // Add our new item
         return db.insert(ItemTable.TABLE, null, values);
     }
 
@@ -161,7 +164,7 @@ public class ItemsDataBaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         String sql = "SELECT * " + " FROM " + ItemTable.TABLE + " WHERE _id = ?";
         Cursor cursor = db.rawQuery(sql, new String[] {Long.toString(_ID)});
-
+        // Gets all items, puts each item data in a Item Object.
         if (cursor.moveToFirst()) {
             item = new Item();
             item.set_id(cursor.getLong(0));
@@ -187,10 +190,12 @@ public class ItemsDataBaseHandler extends SQLiteOpenHelper {
 
     public boolean UpdateCountByID(long id, int count) {
         SQLiteDatabase db = getWritableDatabase();
+        // Setup our update values
         ContentValues values = new ContentValues();
         values.put(ItemTable.COL_COUNT, count);
         values.put(ItemTable.COL_LASTUSER, ActiveUser);
         values.put(ItemTable.COL_LASTDATE, CurrentDate());
+        // This will update based on the values var
         int changed = db.update(ItemTable.TABLE, values, "_id = ?",
                 new String[] { Long.toString(id) });
         return changed >= 1;
@@ -198,9 +203,11 @@ public class ItemsDataBaseHandler extends SQLiteOpenHelper {
     public boolean UpdateDescByID(long id, String desc) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
+        // Setup our update values
         values.put(ItemTable.COL_DESC, desc);
         values.put(ItemTable.COL_LASTUSER, ActiveUser);
         values.put(ItemTable.COL_LASTDATE, CurrentDate());
+        // This will update based on the values var
         int changed = db.update(ItemTable.TABLE, values, "_id = ?",
                 new String[] { Long.toString(id) });
         return changed >= 1;
